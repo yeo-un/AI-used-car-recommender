@@ -1,0 +1,10 @@
+# type: subject (50자 이내, 명령형)
+
+# body (선택)
+# - 무엇을 변경했는지
+# - 왜 변경했는지
+# - 영향 범위
+
+# example:
+# feat: 차량 추천 점수 계산 로직 추가
+# fix: Elasticsearch 검색 결과 누락 문제 수정
