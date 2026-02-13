@@ -5,6 +5,7 @@ from app.services.car_logic import (
     filter_by_budget,
     score_vehicle,
 )
+from app.services.llm_service import generate_reasons_batch
 
 
 class AgentState(TypedDict):
@@ -31,9 +32,26 @@ def score_node(state: AgentState) -> AgentState:
 
     scored = sorted(scored, key=lambda x: x["score"], reverse=True)
 
-    state["scored"] = scored
-    state["result"] = scored[:3]
+    state["scored"] = scored[:3]  # Top 3
+    return state
 
+
+def reason_node(state: AgentState) -> AgentState:
+    cars = state["scored"]
+
+    if not cars:
+        state["result"] = []
+        return state
+
+    reasons_dict = generate_reasons_batch(cars, state["preferences"])
+
+    results_with_reason = []
+
+    for car in cars:
+        reason = reasons_dict.get(str(car["id"]), "")
+        results_with_reason.append({**car, "reason": reason})
+
+    state["result"] = results_with_reason
     return state
 
 
@@ -42,11 +60,13 @@ def build_agent():
 
     graph.add_node("filter", filter_node)
     graph.add_node("score", score_node)
+    graph.add_node("reason", reason_node)
 
     graph.set_entry_point("filter")
 
     graph.add_edge("filter", "score")
-    graph.add_edge("score", END)
+    graph.add_edge("score", "reason")
+    graph.add_edge("reason", END)
 
     return graph.compile()
 
