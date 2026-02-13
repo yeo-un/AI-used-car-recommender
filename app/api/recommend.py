@@ -1,13 +1,16 @@
 from fastapi import APIRouter
 from app.schemas.request import RecommendationRequest
-from app.services.recommender import recommend
+from app.schemas.response import RecommendationResponse
+from app.services.recommendation_service import RecommendationService
 
 router = APIRouter()
 
 
-@router.post("/recommend")
+@router.post("/recommend", response_model=RecommendationResponse)
 async def recommend_car(request: RecommendationRequest):
-    results = recommend(
+    service = RecommendationService()
+
+    results = service.execute(
         budget=request.budget,
         min_year=request.min_year,
         preferred_options=request.preferred_options,
