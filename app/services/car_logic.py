@@ -82,13 +82,13 @@ def calculate_score(
 
     mileage = car["mileage"]
 
-    if mileage <= 30000:
+    if mileage <= 50000:
         mileage_score = 15
 
-    elif mileage <= 60000:
+    elif mileage <= 100000:
         mileage_score = 10
 
-    elif mileage <= 100000:
+    elif mileage <= 150000:
         mileage_score = 5
 
     else:

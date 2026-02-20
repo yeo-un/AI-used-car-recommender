@@ -17,13 +17,15 @@ class RecommendationService:
         preferred_options: list[str],
     ):
 
-        # 1. 예산 이하 차량만 필터 (중요)
+        # 1. 예산 필터
         cars = self.car_repo.get_cars_under_budget(budget)
 
-        results = []
+        # 2. 점수 계산
+        scored_results = []
 
         for car in cars:
             avg_price = self.price_repo.get_avg_price(car.model)
+
             score = calculate_score(
                 car={
                     "price": car.price,
@@ -37,20 +39,26 @@ class RecommendationService:
                 preferred_options=preferred_options,
             )
 
-            car_dict = {
-                "id": car.id,
-                "model": car.model,
-                "price": car.price,
-                "year": car.year,
-                "mileage": car.mileage,
-                "options": car.options or [],
-                "score": score,
-            }
+            scored_results.append(
+                {
+                    "id": car.id,
+                    "model": car.model,
+                    "price": car.price,
+                    "year": car.year,
+                    "mileage": car.mileage,
+                    "options": car.options or [],
+                    "score": score,
+                }
+            )
 
-            car_dict["reason"] = generate_reason(car_dict)
+        # 3. 정렬
+        scored_results.sort(key=lambda x: x["score"], reverse=True)
 
-            results.append(car_dict)
+        # 4. 상위 N개만 선택
+        top_results = scored_results[:5]
 
-        results.sort(key=lambda x: x["score"], reverse=True)
+        # 5. 상위 N개만 LLM 호출
+        for car in top_results:
+            car["reason"] = generate_reason(car)
 
-        return results[:5]
+        return top_results
