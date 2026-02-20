@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS cars (
+    id SERIAL PRIMARY KEY,
+    model VARCHAR(100) NOT NULL,
+    price INTEGER NOT NULL,
+    year INTEGER NOT NULL,
+    mileage INTEGER NOT NULL,
+    options JSONB
+);
+
+
+CREATE TABLE IF NOT EXISTS car_price_stats (
+    model VARCHAR(100) PRIMARY KEY,
+    avg_price NUMERIC NOT NULL,
+    count INTEGER NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

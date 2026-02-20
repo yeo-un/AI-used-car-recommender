@@ -13,8 +13,10 @@ dependencies = [
     "langchain-openai>=1.1.8",
     "openai>=2.20.0",
     "pandas>=2.0.0,<3",
+    "psycopg2-binary>=2.9.11",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
+    "sqlalchemy>=2.0.46",
     "streamlit>=1.40.0",
     "uvicorn[standard]>=0.40.0",
 ]
