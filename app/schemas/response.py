@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 
 class CarResponse(BaseModel):
@@ -8,7 +8,7 @@ class CarResponse(BaseModel):
     price: int
     year: int
     mileage: int
-    options: List[str]
+    options: Optional[List[str]] = []
     score: int
     reason: str
 

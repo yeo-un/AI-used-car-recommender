@@ -4,5 +4,5 @@ from typing import List
 
 class RecommendationRequest(BaseModel):
     budget: int
-    min_year: int
-    preferred_options: List[str]
+    min_year: int = 2015
+    preferred_options: List[str] = []

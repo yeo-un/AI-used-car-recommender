@@ -1,9 +1,13 @@
-from app.db.dummy_data import cars, model_option_metadata
+from sqlalchemy.orm import Session
+from app.db.models import Car
 
 
 class CarRepository:
-    def get_all_cars(self):
-        return cars
+    def __init__(self, db: Session):
+        self.db = db
 
-    def get_available_options(self, model: str):
-        return model_option_metadata.get(model, [])
+    def get_cars_under_budget(self, budget: int):
+        return self.db.query(Car).filter(Car.price <= budget).all()
+
+    def get_all_cars(self):
+        return self.db.query(Car).all()

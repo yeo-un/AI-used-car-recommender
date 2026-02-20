@@ -1,14 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 from app.schemas.request import RecommendationRequest
 from app.schemas.response import RecommendationResponse
 from app.services.recommendation_service import RecommendationService
+from app.db.session import get_db
 
 router = APIRouter()
 
 
 @router.post("/recommend", response_model=RecommendationResponse)
-async def recommend_car(request: RecommendationRequest):
-    service = RecommendationService()
+def recommend_car(
+    request: RecommendationRequest,
+    db: Session = Depends(get_db),
+):
+    service = RecommendationService(db)
 
     results = service.execute(
         budget=request.budget,

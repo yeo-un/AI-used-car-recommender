@@ -1,72 +1,121 @@
-from collections import defaultdict
-
-
-def calculate_avg_price(cars):
-    """
-    모델별 평균 가격 계산
-    """
-    price_sum = defaultdict(int)
-    count = defaultdict(int)
-
-    for car in cars:
-        model = car["model"]
-        price_sum[model] += car["price"]
-        count[model] += 1
-
-    avg_price_map = {}
-
-    for model in price_sum:
-        avg_price_map[model] = price_sum[model] / count[model]
-
-    return avg_price_map
-
-
 def calculate_score(
     car,
-    available_options,
     avg_price,
     budget,
     min_year,
     preferred_options,
 ):
-    score = 100
+    score = 0
 
-    # 평균 시세 대비 가격 점수 (30점)
-    price_ratio = car["price"] / avg_price
+    # ---------------------------
+    # 1. 가격 경쟁력 (40점)
+    # avg_price보다 저렴할수록 점수 높음
+    # ---------------------------
 
-    if price_ratio <= 0.8:
-        price_penalty = 0
-    elif price_ratio <= 1.0:
-        price_penalty = int((price_ratio - 0.8) / 0.2 * 15)
-    elif price_ratio <= 1.2:
-        price_penalty = 15 + int((price_ratio - 1.0) / 0.2 * 15)
+    if avg_price is not None and avg_price > 0:
+        ratio = car["price"] / avg_price
+
+        if ratio <= 0.7:
+            price_score = 40
+
+        elif ratio <= 0.85:
+            price_score = 35
+
+        elif ratio <= 1.0:
+            price_score = 30
+
+        elif ratio <= 1.1:
+            price_score = 20
+
+        else:
+            price_score = 10
+
     else:
-        price_penalty = 30
+        price_score = 20  # avg_price 없으면 중립 점수
 
-    score -= price_penalty
+    score += price_score
 
-    # 예산 초과 패널티
-    if car["price"] > budget:
-        score -= 20
+    # ---------------------------
+    # 2. 예산 적합도 (20점)
+    # budget 대비 얼마나 여유 있는지
+    # ---------------------------
 
-    # 연식
-    if car["year"] < min_year:
-        score -= 20
+    budget_ratio = car["price"] / budget
 
-    # 주행거리
-    mileage_penalty = int((car["mileage"] / 100000) * 20)
-    score -= mileage_penalty
+    if budget_ratio <= 0.7:
+        budget_score = 20
 
-    # 옵션
-    option_score = 30
+    elif budget_ratio <= 0.85:
+        budget_score = 15
 
-    for opt in preferred_options:
-        if opt not in available_options:
-            continue
+    elif budget_ratio <= 1.0:
+        budget_score = 10
 
-        if opt not in car["options"]:
-            option_score -= 10
+    else:
+        budget_score = 0
 
-    score -= 30 - option_score
+    score += budget_score
 
-    return max(score, 0)
+    # ---------------------------
+    # 3. 연식 점수 (15점)
+    # ---------------------------
+
+    year_diff = car["year"] - min_year
+
+    if year_diff >= 3:
+        year_score = 15
+
+    elif year_diff >= 1:
+        year_score = 10
+
+    elif year_diff >= 0:
+        year_score = 5
+
+    else:
+        year_score = 0
+
+    score += year_score
+
+    # ---------------------------
+    # 4. 주행거리 점수 (15점)
+    # ---------------------------
+
+    mileage = car["mileage"]
+
+    if mileage <= 30000:
+        mileage_score = 15
+
+    elif mileage <= 60000:
+        mileage_score = 10
+
+    elif mileage <= 100000:
+        mileage_score = 5
+
+    else:
+        mileage_score = 0
+
+    score += mileage_score
+
+    # ---------------------------
+    # 5. 옵션 점수 (10점)
+    # ---------------------------
+
+    if not preferred_options:
+        option_score = 5
+
+    else:
+        match = 0
+
+        for opt in preferred_options:
+            if opt in (car["options"] or []):
+                match += 1
+
+        option_score = int((match / len(preferred_options)) * 10)
+
+    score += option_score
+
+    # ---------------------------
+    # 최종 점수
+    # ---------------------------
+
+    return int(score)
