@@ -15,15 +15,9 @@
 
 ## 🏗️ 시스템 아키텍처
 
-[ User ]
-   ↓
-FastAPI Backend
-   ↓
-Recommendation Engine (LangChain + RAG)
-   ↓
-PostgreSQL / Elasticsearch / Redis
-   ↓
-Crawler Pipeline
+<img width="665" height="584" alt="image" src="https://github.com/user-attachments/assets/ea676292-c672-4491-95ff-7877f3764598" />
+
+
 
 ---
 
@@ -89,13 +83,13 @@ Crawler Pipeline
 
 ## 📂 프로젝트 구조
 
-backend/
-├─ api/
-├─ services/
-├─ models/
-crawler/
-rag/
-docker/
+backend/<br/>
+├─ api/<br/>
+├─ services/<br/>
+├─ models/<br/>
+crawler/<br/>
+rag/<br/>
+docker/<br/>
 
 ---
 
